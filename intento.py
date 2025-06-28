@@ -22,7 +22,7 @@ df["oh_label"] = df["oh_label"].astype(int)
 # 2. Tomar una muestra del 10% estratificada por 'oh_label'
 df_reducido, _ = train_test_split(
     df,
-    train_size=0.10,  # Puedes ajustar esto según tu RAM
+    train_size=0.01,  # Puedes ajustar esto según tu RAM
     stratify=df["oh_label"],
     random_state=42
 )
@@ -91,7 +91,7 @@ training_args = TrainingArguments(
     per_device_eval_batch_size=8,
     num_train_epochs=5,
     weight_decay=0.01,
-    learning_rate=2e-5,
+    learning_rate=0.01,
     logging_dir="./logs",
     logging_steps=10,
     do_eval=True,
