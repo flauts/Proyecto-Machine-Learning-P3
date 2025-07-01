@@ -9,4 +9,4 @@
 #SBATCH --account=pregrado
 #SBATCH --mail-type=END,FAIL
 #SBATCH --mail-user=hector.nieto@utec.edu.pe
-srun python3 tfidf.py
+srun python3 tfidf_experiment.py
