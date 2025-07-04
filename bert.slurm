@@ -5,7 +5,7 @@
 #SBATCH --mem=98G
 #SBATCH --output=bert.out
 #SBATCH --error=bert.err
-#SBATCH --partition=big-mem
+#SBATCH --partition=data-science
 #SBATCH --account=pregrado
 #SBATCH --mail-type=END,FAIL
 #SBATCH --mail-user=jose.galvez.p@utec.edu.pe
