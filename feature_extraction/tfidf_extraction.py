@@ -2,8 +2,7 @@
 import pandas as pd
 import os
 #%%
-train_df = pd.read_csv('../datasets/original/BullyingMultiClase.csv')
-predict_df = pd.read_csv('../datasets/original/BullyingPredict.csv')
+train_df = pd.read_csv('../datasets/train.csv')
 #%% md
 # # Feature extraction
 #%%
@@ -23,7 +22,6 @@ tfidf= TfidfVectorizer(sublinear_tf=True, min_df=5,
                        ngram_range=(1, 2), stop_words='english', max_features=5000)
 features_train = tfidf.fit_transform(train_df.text).toarray()
 labels_train = train_df.label
-features_predict = tfidf.fit_transform(predict_df.text).toarray()
 #%%
 import os
 from joblib import dump
@@ -35,4 +33,3 @@ os.makedirs(tfidf_folder, exist_ok=True)
 dump(tfidf, os.path.join(tfidf_folder, "tfidf_vectorizer.joblib"))
 dump(features_train, os.path.join(tfidf_folder, "features_train.joblib"))
 dump(labels_train, os.path.join(tfidf_folder, "labels_train.joblib"))
-dump(features_predict, os.path.join(tfidf_folder, "features_predict.joblib"))
