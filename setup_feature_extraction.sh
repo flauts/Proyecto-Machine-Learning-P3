@@ -19,6 +19,6 @@ echo "Submitting tfidf.slurm job..."
 sbatch tfidf.slurm
 
 echo "Submitting bert.slurm job..."
-sbatch bert.slurm
+sbatch roberta.slurm
 
 echo "All jobs submitted!"
