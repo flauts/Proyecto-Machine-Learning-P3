@@ -11,6 +11,8 @@ from sklearn.metrics import classification_report
 import numpy as np
 import dataframe_image as dfi
 import os  # Import os to create directory
+import joblib  # Add this at the top with other imports
+
 
 # 2. Verificar dispositivo
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -23,6 +25,15 @@ except FileNotFoundError:
     print("❌ ERROR: Main data file 'BullyingMultiClase.csv' not found. Please ensure it is in the correct directory.")
     exit()
 
+
+# Fit label encoder before passing to Dataset
+label_encoder = LabelEncoder()
+label_encoder.fit(df["label"])  # Fit once on the entire dataset
+
+# Save it to disk
+joblib.dump(label_encoder, "label_encoder.joblib")
+print("✅ Label encoder saved to label_encoder.joblib")
+
 # 4. Separar entrenamiento y validación
 train_texts, val_texts, train_labels, val_labels = train_test_split(
     df["text"].tolist(), df["label"].tolist(), test_size=0.2, random_state=42)
@@ -33,9 +44,9 @@ tokenizer = AutoTokenizer.from_pretrained("xlm-roberta-base")
 label_encoder = LabelEncoder()
 # 6. Dataset personalizado
 class BullyingDataset(Dataset):
-    def __init__(self, texts, labels, tokenizer, max_len=128):
+    def __init__(self, texts, labels, tokenizer, label_encoder, max_len=128):
         self.texts = texts
-        self.labels = label_encoder.fit_transform(labels)
+        self.labels = label_encoder.transform(labels)
         self.tokenizer = tokenizer
         self.max_len = max_len
 
@@ -57,8 +68,9 @@ class BullyingDataset(Dataset):
         }
 
 
-train_dataset = BullyingDataset(train_texts, train_labels, tokenizer)
-val_dataset = BullyingDataset(val_texts, val_labels, tokenizer)
+train_dataset = BullyingDataset(train_texts, train_labels, tokenizer, label_encoder)
+val_dataset = BullyingDataset(val_texts, val_labels, tokenizer, label_encoder)
+
 
 train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size=16)

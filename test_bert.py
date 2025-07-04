@@ -6,6 +6,7 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import dataframe_image as dfi
+from sklearn.preprocessing import LabelEncoder
 
 # --- CONFIGURATION ---
 MODEL_DIR = "./saved_cyberbullying_model"  # Path to your saved model
