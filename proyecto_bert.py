@@ -48,7 +48,7 @@ train_texts, val_texts, train_labels, val_labels = train_test_split(
     df["text"].tolist(), df["label_numeric"].tolist(), test_size=0.2, random_state=42, stratify=df["label_numeric"])
 
 # 5. Tokenizador
-tokenizer = AutoTokenizer.from_pretrained("xlm-roberta-base")
+tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
 
 
 # 6. Dataset personalizado - CORREGIDO
@@ -87,7 +87,7 @@ train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)  # 🔧 Ba
 val_loader = DataLoader(val_dataset, batch_size=32)
 
 # 7. Cargar modelo
-model = AutoModelForSequenceClassification.from_pretrained("xlm-roberta-base", num_labels=4)
+model = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=4)
 model = model.to(device)
 
 # 8. Optimizador y Scheduler - MEJORADO
@@ -124,7 +124,7 @@ print(f"📁 Experimento guardado en: {experiment_dir}")
 
 # Guardar configuración del experimento
 config = {
-    'model_name': 'xlm-roberta-base',
+    'model_name': 'bert-base-uncased',
     'num_labels': 4,
     'batch_size': 32,
     'learning_rate': 2e-5,
@@ -288,7 +288,7 @@ print("\n🧮 Extrayendo embeddings BERT para análisis...")
 from transformers import AutoModel as BertModel
 
 # Cargar modelo base para extracción
-bert_base = BertModel.from_pretrained("xlm-roberta-base").to(device)
+bert_base = BertModel.from_pretrained("bert-base-uncased").to(device)
 bert_base.eval()
 
 def extract_bert_embeddings(texts, model, tokenizer, batch_size=32):
