@@ -13,6 +13,7 @@ import numpy as np
 
 # Load and prepare data
 df_train = pd.read_csv('datasets/train.csv')
+df_test = pd.read_csv('datasets/test.csv')
 label_mapping = {
     'not_cyberbullying': 0,
     'gender/sexual': 1,
@@ -22,12 +23,15 @@ label_mapping = {
 
 # Apply the mapping to your dataframe
 df_train['label'] = df_train['label'].map(label_mapping)
+df_test['label'] = df_test['label'].map(label_mapping)
 unmapped = df_train['label'].isna().sum()
 if unmapped > 0:
     print(f"Warning: {unmapped} labels couldn't be mapped!")
     print("Unique labels in data:", df_train['label'].unique())
 train_texts = df_train['text']
 train_labels = df_train['label']
+test_texts = df_test['text']
+test_labels = df_test['label']
 #%%
 # Initialize model and tokenizer
 model_ckpt = "bert-base-uncased"
@@ -74,11 +78,18 @@ X_train = extract_features(train_texts)
 
 # Convert labels to numpy arrays
 y_train = np.array(train_labels)
+
+X_test = extract_features(test_texts)
+y_test = np.array(test_labels)
 # Save extracted features
 print("Saving extracted features...")
 
 dump(X_train, os.path.join(bert_folder,'X_train_features.joblib'))
 
 dump(y_train,  os.path.join(bert_folder,'y_train_features.joblib'))
+
+dump(X_test, os.path.join(bert_folder,'X_test_features.joblib'))
+
+dump(y_test, os.path.join(bert_folder,'y_test_features.joblib'))
 
 print(f"X_train shape: {X_train.shape}, y_train shape: {y_train.shape}")
