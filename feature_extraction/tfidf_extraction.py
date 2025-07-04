@@ -2,19 +2,19 @@
 import pandas as pd
 import os
 #%%
-train_df = pd.read_csv('../datasets/train.csv')
+train_df = pd.read_csv('datasets/train.csv')
 #%% md
 # # Feature extraction
 #%%
-if not os.path.exists('../features'):
-    os.makedirs('../features')
+if not os.path.exists('features'):
+    os.makedirs('features')
 #%% md
 # # TF-IDF
 #%%
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-if not os.path.exists('../features/tfidf'):
-    os.makedirs('../features/tfidf')
+if not os.path.exists('features/tfidf'):
+    os.makedirs('features/tfidf')
 
 tfidf_folder = "features/tfidf"
 #%%

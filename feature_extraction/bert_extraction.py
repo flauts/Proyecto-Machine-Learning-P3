@@ -1,6 +1,6 @@
 import os
-if not os.path.exists('../features/bert'):
-    os.makedirs('../features/bert')
+if not os.path.exists('features/bert'):
+    os.makedirs('features/bert')
 
 bert_folder = "features/bert"
 #%%
@@ -12,7 +12,7 @@ from joblib import dump
 import numpy as np
 
 # Load and prepare data
-df_train = pd.read_csv('../datasets/train.csv')
+df_train = pd.read_csv('datasets/train.csv')
 label_mapping = {
     'not_cyberbullying': 0,
     'gender/sexual': 1,

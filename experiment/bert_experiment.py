@@ -128,6 +128,7 @@ trainer.train()
 results = trainer.evaluate()
 print(results)
 #%%
+from matplotlib import pyplot as plt
 from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay
 
 # Generate predictions
@@ -140,7 +141,10 @@ print(classification_report(tokenized_datasets["test"]["label"], predicted_label
 # Confusion matrix
 cm = confusion_matrix(tokenized_datasets["test"]["label"], predicted_labels)
 disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["NO CB", "sexual","race", "religion"])
-disp.plot()
+disp.plot(cmap="Blues")  # Optional: set a color map
+plt.tight_layout()
+plt.savefig("confusion_matrix.png", dpi=300)  # You can change the name or dpi as needed
+plt.close()  # Close the plot to free memory if you're in a loop
 #%%
 # Inspect misclassified samples
 for idx, (pred, label) in enumerate(zip(predicted_labels, tokenized_datasets["test"]["label"])):
@@ -148,3 +152,11 @@ for idx, (pred, label) in enumerate(zip(predicted_labels, tokenized_datasets["te
         print(f"Index: {idx}, Predicted: {pred}, Actual: {label}")
         print(tokenized_datasets["test"][idx]["text"])
 #%%
+import os
+
+# Add this after trainer.train() and evaluation
+# Save the trained model and tokenizer
+os.makedirs("./bert_model", exist_ok=True)
+trainer.save_model("./bert_model")
+tokenizer.save_pretrained("./bert_model")
+print("Model saved successfully!")
