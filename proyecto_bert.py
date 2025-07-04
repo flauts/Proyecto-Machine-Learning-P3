@@ -1,6 +1,7 @@
 # 1. Importar librerías
 import pandas as pd
 import torch
+from sklearn.preprocessing import LabelEncoder
 from torch.utils.data import Dataset, DataLoader
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, \
     get_linear_schedule_with_warmup
@@ -29,12 +30,12 @@ train_texts, val_texts, train_labels, val_labels = train_test_split(
 # 5. Tokenizador
 tokenizer = AutoTokenizer.from_pretrained("xlm-roberta-base")
 
-
+label_encoder = LabelEncoder()
 # 6. Dataset personalizado
 class BullyingDataset(Dataset):
     def __init__(self, texts, labels, tokenizer, max_len=128):
         self.texts = texts
-        self.labels = labels
+        self.labels = label_encoder.fit_transform(labels)
         self.tokenizer = tokenizer
         self.max_len = max_len
 
