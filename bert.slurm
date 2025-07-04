@@ -9,4 +9,4 @@
 #SBATCH --account=pregrado
 #SBATCH --mail-type=END,FAIL
 #SBATCH --mail-user=jose.galvez.p@utec.edu.pe
-srun python3 bert.py
+srun python3 proyecto_bert.py
