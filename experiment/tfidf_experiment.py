@@ -22,14 +22,16 @@ if not os.path.exists("plots"):
 # ## Carga y Preparación de Datos
 # Cargamos las características TF-IDF y etiquetas previamente generadas.
 #%%
-features = load('features/tfidf/features_train.joblib')
-labels = load('features/tfidf/labels_train.joblib')
+X_train = load('features/tfidf/features_train.joblib')
+y_train = load('features/tfidf/labels_train.joblib')
+X_test = load('features/tfidf/features_test.joblib')
+y_test = load('features/tfidf/labels_test.joblib')
 
-print(f"Dimensiones de las características: {features.shape}")
-print(f"Número de clases únicas: {len(np.unique(labels))}")
+print(f"Dimensiones de las características: {X_train.shape}")
+print(f"Número de clases únicas: {len(np.unique(y_train))}")
 #%%
 plt.figure(figsize=(10, 6))
-clase_counts = pd.Series(labels).value_counts()
+clase_counts = pd.Series(y_train).value_counts()
 sns.barplot(x=clase_counts.index, y=clase_counts.values)
 plt.title('Distribución de Clases')
 plt.xlabel('Clase')
@@ -38,8 +40,6 @@ plt.xticks(rotation=45)
 plt.tight_layout()
 plt.savefig('plots/class_distribution.png')
 #%%
-X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size=0.2, random_state=42)
-
 param_grid = {
     'RandomForest': {
         'n_estimators': [20],
