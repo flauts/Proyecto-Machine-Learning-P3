@@ -144,7 +144,3 @@ os.makedirs(output_dir, exist_ok=True)  # Create directory if it doesn't exist
 model.save_pretrained(output_dir)
 tokenizer.save_pretrained(output_dir)
 print(f"✅ Model and tokenizer saved to {output_dir}")
-
-# 12. PREDICT ON NEW DATA AND SAVE OUTPUT
-# (This section remains the same, running predictions right after training)
-# ... (The prediction code from section 12 in the previous answer goes here) ...
