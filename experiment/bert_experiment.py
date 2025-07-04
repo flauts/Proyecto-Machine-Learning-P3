@@ -79,6 +79,7 @@ from transformers import TrainingArguments
 training_args = TrainingArguments(
     output_dir="./results",           # Directory for saving model checkpoints
     eval_strategy="epoch",     # Evaluate at the end of each epoch
+    save_strategy="epoch",
     learning_rate=5e-5,              # Start with a small learning rate
     per_device_train_batch_size=16,  # Batch size per GPU
     per_device_eval_batch_size=16,
