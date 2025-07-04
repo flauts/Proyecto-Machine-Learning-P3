@@ -11,14 +11,13 @@ source env/bin/activate
 # 2. Upgrade pip and install dependencies
 echo "Installing dependencies..."
 pip install --upgrade pip
-pip install pandas transformers scikit-learn joblib
-pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
+pip install -r requirements.txt
 
 # 3. Submit SLURM jobs
 echo "Submitting tfidf.slurm job..."
-sbatch tfidf.slurm
+sbatch tfidf_extraction.slurm
 
 echo "Submitting bert.slurm job..."
-sbatch roberta.slurm
+sbatch bert_extraction.slurm
 
 echo "All jobs submitted!"
