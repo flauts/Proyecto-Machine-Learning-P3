@@ -1,74 +1,84 @@
-#%%
-import pandas as pd
 import os
-#%%
-train_df = pd.read_csv('BullyingMultiClase.csv')
-predict_df = pd.read_csv('BullyingPredict.csv')
-#%% md
-# # Feature extraction
-#%%
-if not os.path.exists('features'):
-    os.makedirs('features')
-# # BERT_EMBEDDING
-#%%
-if not os.path.exists('features/tfidf'):
-    os.makedirs('features/tfidf')
+if not os.path.exists('features/bert'):
+    os.makedirs('features/bert')
 
 bert_folder = "features/bert"
 #%%
+from transformers import AutoModel, AutoTokenizer
 import torch
-from transformers import AutoTokenizer, AutoModel
-from torch.utils.data import DataLoader
-from tqdm import tqdm  # optional progress bar
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from joblib import dump
+import numpy as np
 
-# 1. Set device
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+# Load and prepare data
+df_train = pd.read_csv('BullyingMultiClase.csv')
+label_mapping = {
+    'not_cyberbullying': 0,
+    'gender/sexual': 1,
+    'ethnicity/race': 2,
+    'religion': 3
+}
 
-# 2. Load tokenizer and base model (no classification head)
-tokenizer = AutoTokenizer.from_pretrained("xlm-roberta-base")
-model = AutoModel.from_pretrained("xlm-roberta-base").to(device)
-model.eval()  # Turn off dropout, etc.
+# Apply the mapping to your dataframe
+df_train['label'] = df_train['label'].map(label_mapping)
+unmapped = df_train['label'].isna().sum()
+if unmapped > 0:
+    print(f"Warning: {unmapped} labels couldn't be mapped!")
+    print("Unique labels in data:", df_train['label'].unique())
+train_texts = df_train['text']
+train_labels = df_train['label']
+#%%
+# Initialize model and tokenizer
+model_ckpt = "bert-base-uncased"
+tokenizer = AutoTokenizer.from_pretrained(model_ckpt)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print("device: ", device)
+model = AutoModel.from_pretrained(model_ckpt).to(device)
 
+def extract_features(texts, max_length=200):
+    """Extract features from texts using BERT"""
+    all_hidden_states = []
 
-# 3. Define a mean pooling function
-def mean_pool(last_hidden_state, attention_mask):
-    mask = attention_mask.unsqueeze(-1).expand(last_hidden_state.size()).float()
-    summed = torch.sum(last_hidden_state * mask, dim=1)
-    counts = torch.clamp(mask.sum(1), min=1e-9)
-    return summed / counts  # Shape: [batch_size, 768]
+    # Process in batches to avoid memory issues
+    batch_size = 256
+    for i in range(0, len(texts), batch_size):
+        batch_texts = texts[i:i+batch_size].tolist()
 
+        # Tokenize batch
+        inputs = tokenizer(
+            batch_texts,
+            padding='max_length',
+            truncation=True,
+            max_length=max_length,  # You can tune this parameter
+            return_tensors="pt"
+        )
 
-# 4. Function to extract features from a list of texts
-from tqdm import tqdm
+        # Move to device
+        inputs = {k: v.to(device) for k, v in inputs.items()}
 
-
-def extract_features(texts, batch_size=64):
-    all_embeddings = []
-    dataloader = DataLoader(texts, batch_size=batch_size)
-    for batch in tqdm(dataloader, desc="Extracting features"):
-        # Tokenize a batch of texts
-        encoded = tokenizer(batch, padding=True, truncation=True,
-                            return_tensors="pt", max_length=128)
-        encoded = {k: v.to(device) for k, v in encoded.items()}
-
+        # Extract features
         with torch.no_grad():
-            output = model(**encoded)
-            embeddings = mean_pool(output.last_hidden_state, encoded["attention_mask"])
-            all_embeddings.append(embeddings.cpu())
+            outputs = model(**inputs)
+            # Use [CLS] token representation (first token)
+            cls_embeddings = outputs.last_hidden_state[:, 0, :]
+            all_hidden_states.append(cls_embeddings.cpu().numpy())
 
-    return torch.cat(all_embeddings, dim=0)
-
-
-# 5. Extract features for train data
-x_train = extract_features(train_df["text"].tolist(), batch_size=256)
-y_train = train_df["label"]
-
-# 6. Extract features for predict data
-x_predict = extract_features(predict_df["text"].tolist(), batch_size=256)
-
-# 7. Save the features and labels
-torch.save(x_train, os.path.join(bert_folder, "x_train.pt"))
-torch.save(y_train, os.path.join(bert_folder, "y_train.pt"))
-torch.save(x_predict, os.path.join(bert_folder, "x_predict.pt"))
+    return np.vstack(all_hidden_states)
 
 #%%
+
+# Extract features for all splits
+print("Extracting features...")
+X_train = extract_features(train_texts)
+
+# Convert labels to numpy arrays
+y_train = np.array(train_labels)
+# Save extracted features
+print("Saving extracted features...")
+
+dump(X_train, os.path.join(bert_folder,'X_train_features.joblib'))
+
+dump(y_train,  os.path.join(bert_folder,'y_train_features.joblib'))
+
+print(f"X_train shape: {X_train.shape}, y_train shape: {y_train.shape}")
