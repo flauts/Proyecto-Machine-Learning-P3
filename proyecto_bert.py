@@ -2,8 +2,9 @@
 import pandas as pd
 import torch
 from torch.utils.data import Dataset, DataLoader
-from transformers import AutoTokenizer, AutoModelForSequenceClassification, AdamWeightDecay, \
+from transformers import AutoTokenizer, AutoModelForSequenceClassification, \
     get_linear_schedule_with_warmup
+from torch.optim import AdamW as AdamWeightDecay
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 import numpy as np
