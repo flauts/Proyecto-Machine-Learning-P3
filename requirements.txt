@@ -10,3 +10,4 @@ seaborn
 dataframe_image
 joblib
 accelerate>=0.26.0
+evaluate
