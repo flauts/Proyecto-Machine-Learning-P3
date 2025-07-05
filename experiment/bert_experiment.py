@@ -98,7 +98,7 @@ from transformers import Trainer
 from evaluate import load
 
 # Load a metric (recall and precision for our dataset ania)
-metric = load("precision_recall")
+metric = load("recall")
 
 # Define a custom compute_metrics function
 def compute_metrics(eval_pred):
