@@ -2,8 +2,8 @@
 import pandas as pd
 import os
 #%%
-train_df = pd.read_csv('datasets/train.csv')
-test_df = pd.read_csv('datasets/test.csv')
+train_df = pd.read_csv('datasets/train_data.csv')
+test_df = pd.read_csv('datasets/test_data.csv')
 #%% md
 # # Feature extraction
 #%%

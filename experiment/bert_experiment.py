@@ -16,7 +16,7 @@ import numpy as np
 from datasets import load_dataset
 
 # Load a custom CSV file
-data_files = {"train": "datasets/train.csv", "test": "datasets/test.csv"}
+data_files = {"train": "datasets/train_data.csv", "test": "datasets/test_data.csv"}
 dataset = load_dataset("csv", data_files=data_files)
 
 # Inspect the first few samples
