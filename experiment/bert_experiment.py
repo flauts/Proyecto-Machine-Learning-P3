@@ -16,7 +16,7 @@ import numpy as np
 from datasets import load_dataset
 
 # Load a custom CSV file
-data_files = {"train": "train.csv", "test": "test.csv"}
+data_files = {"train": "datasets/train.csv", "test": "datasets/test.csv"}
 dataset = load_dataset("csv", data_files=data_files)
 
 # Inspect the first few samples
@@ -26,7 +26,8 @@ label_mapping = {
     'not_cyberbullying': 0,
     'gender/sexual': 1,
     'ethnicity/race': 2,
-    'religion': 3
+    'religion': 3,
+    'other_cyberbullying':4
 }
 dataset = dataset.map(lambda x: {"label": label_mapping[x["label"]]})
 
@@ -47,7 +48,7 @@ tokenized_datasets = dataset.map(tokenize_function, batched=True)
 print(tokenized_datasets["train"][0])
 #%%
 model_name = "bert-base-uncased"
-model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=4)
+model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=5)
 
 print(model.config)
 #%% md
@@ -79,6 +80,7 @@ from transformers import TrainingArguments
 training_args = TrainingArguments(
     output_dir="./results",           # Directory for saving model checkpoints
     eval_strategy="epoch",     # Evaluate at the end of each epoch
+    save_strategy="epoch",
     learning_rate=5e-5,              # Start with a small learning rate
     per_device_train_batch_size=16,  # Batch size per GPU
     per_device_eval_batch_size=16,
@@ -95,15 +97,31 @@ print(training_args)
 #%%
 from transformers import Trainer
 from evaluate import load
+from sklearn.metrics import accuracy_score, precision_recall_fscore_support
+import numpy as np
 
 # Load a metric (recall and precision for our dataset ania)
-metric = load("precision_recall")
+metric = load("recall")
 
 # Define a custom compute_metrics function
 def compute_metrics(eval_pred):
     logits, labels = eval_pred
-    predictions = logits.argmax(axis=-1)
-    return metric.compute(predictions=predictions, references=labels)
+    predictions = np.argmax(logits, axis=-1)
+
+    # Calculate accuracy
+    accuracy = accuracy_score(labels, predictions)
+
+    # Calculate precision, recall, f1 with macro averaging (treats all classes equally)
+    precision, recall, f1, _ = precision_recall_fscore_support(
+        labels, predictions, average='macro', zero_division=0
+    )
+
+    return {
+        'accuracy': accuracy,
+        'precision': precision,
+        'recall': recall,
+        'f1': f1
+    }
 #%%
 from transformers import DataCollatorWithPadding
 
@@ -128,6 +146,7 @@ trainer.train()
 results = trainer.evaluate()
 print(results)
 #%%
+from matplotlib import pyplot as plt
 from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay
 
 # Generate predictions
@@ -139,8 +158,11 @@ print(classification_report(tokenized_datasets["test"]["label"], predicted_label
 
 # Confusion matrix
 cm = confusion_matrix(tokenized_datasets["test"]["label"], predicted_labels)
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["NO CB", "sexual","race", "religion"])
-disp.plot()
+disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["NO CB", "sexual","race", "religion","other"])
+disp.plot(cmap="Blues")  # Optional: set a color map
+plt.tight_layout()
+plt.savefig("confusion_matrix.png", dpi=300)  # You can change the name or dpi as needed
+plt.close()  # Close the plot to free memory if you're in a loop
 #%%
 # Inspect misclassified samples
 for idx, (pred, label) in enumerate(zip(predicted_labels, tokenized_datasets["test"]["label"])):
@@ -148,3 +170,11 @@ for idx, (pred, label) in enumerate(zip(predicted_labels, tokenized_datasets["te
         print(f"Index: {idx}, Predicted: {pred}, Actual: {label}")
         print(tokenized_datasets["test"][idx]["text"])
 #%%
+import os
+
+# Add this after trainer.train() and evaluation
+# Save the trained model and tokenizer
+os.makedirs("./bert_model", exist_ok=True)
+trainer.save_model("./bert_model")
+tokenizer.save_pretrained("./bert_model")
+print("Model saved successfully!")
