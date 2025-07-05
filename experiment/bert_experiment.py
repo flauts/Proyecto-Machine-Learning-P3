@@ -96,6 +96,8 @@ print(training_args)
 #%%
 from transformers import Trainer
 from evaluate import load
+from sklearn.metrics import accuracy_score, precision_recall_fscore_support
+import numpy as np
 
 # Load a metric (recall and precision for our dataset ania)
 metric = load("recall")
@@ -103,8 +105,22 @@ metric = load("recall")
 # Define a custom compute_metrics function
 def compute_metrics(eval_pred):
     logits, labels = eval_pred
-    predictions = logits.argmax(axis=-1)
-    return metric.compute(predictions=predictions, references=labels)
+    predictions = np.argmax(logits, axis=-1)
+
+    # Calculate accuracy
+    accuracy = accuracy_score(labels, predictions)
+
+    # Calculate precision, recall, f1 with macro averaging (treats all classes equally)
+    precision, recall, f1, _ = precision_recall_fscore_support(
+        labels, predictions, average='macro', zero_division=0
+    )
+
+    return {
+        'accuracy': accuracy,
+        'precision': precision,
+        'recall': recall,
+        'f1': f1
+    }
 #%%
 from transformers import DataCollatorWithPadding
 
