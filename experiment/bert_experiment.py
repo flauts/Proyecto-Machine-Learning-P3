@@ -134,7 +134,7 @@ trainer = Trainer(
     eval_dataset=tokenized_datasets["test"],
     tokenizer=tokenizer,
     data_collator=data_collator,        # Efficient batching
-    compute_metrics=compute_metrics,    # Custom metric
+    compute_metrics=compute_metrics,# Custom metric
 )
 from transformers import EarlyStoppingCallback
 
