@@ -18,7 +18,8 @@ label_mapping = {
     'not_cyberbullying': 0,
     'gender/sexual': 1,
     'ethnicity/race': 2,
-    'religion': 3
+    'religion': 3,
+    'other_cyberbullying':4
 }
 
 # Apply the mapping to your dataframe

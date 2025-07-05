@@ -26,7 +26,8 @@ label_mapping = {
     'not_cyberbullying': 0,
     'gender/sexual': 1,
     'ethnicity/race': 2,
-    'religion': 3
+    'religion': 3,
+    'other_cyberbullying':4
 }
 dataset = dataset.map(lambda x: {"label": label_mapping[x["label"]]})
 
@@ -47,7 +48,7 @@ tokenized_datasets = dataset.map(tokenize_function, batched=True)
 print(tokenized_datasets["train"][0])
 #%%
 model_name = "bert-base-uncased"
-model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=4)
+model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=5)
 
 print(model.config)
 #%% md
@@ -157,7 +158,7 @@ print(classification_report(tokenized_datasets["test"]["label"], predicted_label
 
 # Confusion matrix
 cm = confusion_matrix(tokenized_datasets["test"]["label"], predicted_labels)
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["NO CB", "sexual","race", "religion"])
+disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["NO CB", "sexual","race", "religion","other"])
 disp.plot(cmap="Blues")  # Optional: set a color map
 plt.tight_layout()
 plt.savefig("confusion_matrix.png", dpi=300)  # You can change the name or dpi as needed
