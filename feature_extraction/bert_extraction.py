@@ -16,10 +16,11 @@ df_train = pd.read_csv('datasets/train.csv')
 df_test = pd.read_csv('datasets/test.csv')
 label_mapping = {
     'not_cyberbullying': 0,
-    'gender/sexual': 1,
-    'ethnicity/race': 2,
+    'gender': 1,
+    'ethnicity': 2,
     'religion': 3,
-    'other_cyberbullying':4
+    'other_cyberbullying':4,
+    'age': 5
 }
 
 # Apply the mapping to your dataframe

@@ -159,7 +159,7 @@ print(classification_report(tokenized_datasets["test"]["label"], predicted_label
 
 # Confusion matrix
 cm = confusion_matrix(tokenized_datasets["test"]["label"], predicted_labels)
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["NO CB", "sexual","race", "religion","other"])
+disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["NO CB", "gender","ethnicity", "religion","other","age"])
 disp.plot(cmap="Blues")  # Optional: set a color map
 plt.tight_layout()
 plt.savefig("plots/confusion_matrix_bert.png", dpi=300)  # You can change the name or dpi as needed
