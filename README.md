@@ -1,6 +1,12 @@
-# Clasificación Multiclase de Cyberbullying
+# Clasificación de Cyberbullying
 
 Sistema de clasificación automática de mensajes de cyberbullying que identifica diferentes tipos de discriminación (étnica, religiosa, de género, edad u otros) usando técnicas de NLP y machine learning.
+
+## Integrantes
+- Alejandro Joel Ore Garcia
+- Iam André Salvador Cucho Jordán
+- Jose Guillermo Gálvez Pacori
+- Héctor Sebastian Nieto Paz
 
 ## Categorías de Clasificación
 
